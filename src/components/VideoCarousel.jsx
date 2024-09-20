@@ -22,6 +22,12 @@ export default function VideoCarousel() {
     const { isEnd, isLastVideo, startPlay, videoId, isPlaying } = video
 
     useGSAP(() => {
+        gsap.to('#slider', {
+            transform: `translateX(${-100 * videoId}%)`,
+            duration: 2,
+            ease: "power2.inOut"
+        })
+
         gsap.to('#video', {
             scrollTrigger: {
                 trigger: '#video',
@@ -48,23 +54,57 @@ export default function VideoCarousel() {
 
     useEffect(() => {
         //where are we in video playing journey?
-        const currentProgress = 0
+        let currentProgress = 0
         let span = videoSpanRef.current
 
         if (span[videoId]) {
             //animate the progress of the video
             let anim = gsap.to(span[videoId], {
                 onUpdate: () => {
+                    const progress = Math.ceil(anim.progress() * 100)
+                    if (progress != currentProgress) {
+                        currentProgress = progress
 
+                        gsap.to(videoDivRef.current[videoId], {
+                            width: window.innerWidth < 760 ? '10vw' : window.innerWidth < 1200 ? '10vw' : '4vw'
+                        })
+
+                        gsap.to(span[videoId], {
+                            width: `${currentProgress}%`,
+                            backgroundColor: 'white'
+                        })
+                    }
                 },
 
                 onComplete: () => {
-
+                    if (isPlaying) {
+                        gsap.to(videoDivRef.current[videoId], {
+                            width: '12px'
+                        })
+                        gsap.to(span[videoId], {
+                            backgroundColor: '#afafaf'
+                        })
+                    }
                 }
-
             })
-        }
 
+            if (videoId == 0) {
+                anim.restart(); //utility handler given by gsap
+            }
+
+            //update the progress bar
+            const animUpdate = () => {
+                anim.progress(
+                    videoRef.current[videoId].currentTime / hightlightsSlides[videoId].videoDuration
+                )
+            }
+
+            if (isPlaying) {
+                gsap.ticker.add(animUpdate) // ticker to update the progress bar
+            } else {
+                gsap.ticker.remove(animUpdate)
+            }
+        }
     }, [videoId, startPlay]) //call useEffect when videoId or startPlay changes
 
     const handleProcess = (type, i) => {
@@ -81,6 +121,9 @@ export default function VideoCarousel() {
             case 'play':
                 setVideo((prevVideo) => ({ ...prevVideo, isPlaying: !prevVideo.isPlaying }))
                 break
+            case 'pause':
+                setVideo((prevVideo) => ({ ...prevVideo, isPlaying: !prevVideo.isPlaying }))
+                break
             default:
                 return video
         }
@@ -94,6 +137,9 @@ export default function VideoCarousel() {
                         <div className='video-carousel_container'>
                             <div className='w-full h-full flex-center rounded-3xl overflow-hidden bg-black'>
                                 <video id='video' playsInline={true} preload='auto' muted ref={(el) => (videoRef.current[i] = el)}
+                                    onEnded={() =>
+                                        i !== 3 ? handleProcess('video-end', i) : handleProcess('video-last')
+                                    }
                                     onPlay={() => {
                                         setVideo((prevVideo) => ({
                                             ...prevVideo, isPlaying: true
@@ -111,7 +157,7 @@ export default function VideoCarousel() {
                         </div>
                     </div>
                 ))}
-            </div>
+            </div >
 
             <div className='relative flex-center mt-10'>
                 <div className='flex-center py-5 px-7 bg-gray-300 backdrop-blur rounded-full'>
