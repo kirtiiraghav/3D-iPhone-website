@@ -30,10 +30,9 @@ export default function Footer() {
 
                 <div className="bg-neutral-700 my-5 h-[1px] w-full"></div>
 
-                <p className='text-center text-sm text-gray'>Code by
-                    <a target='_blank' className='hover:text-white text-gray my-5 h-[1px] w-full' href='https://github.com/kirtiiraghav/iPhone-website'>
-                        Kirti Raghav</a> | Connect on
-                    <a target='_blank' className='hover:text-white text-gray' href='https://www.linkedin.com/in/kirtiiraghav/'>LinkedIn
+                <p className='text-center text-sm text-gray'>Code by 
+                    <a target='_blank' className='hover:text-white text-gray my-5 h-[1px] w-full' href='https://github.com/kirtiiraghav/iPhone-website'> Kirti Raghav</a> | Connect on
+                    <a target='_blank' className='hover:text-white text-gray' href='https://www.linkedin.com/in/kirtiiraghav/'> LinkedIn
                     </a>
                 </p>
 
